@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{titulo}} - AGYM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos principales para Gaming Zone */
+        :root {
+            --primary: #6c63ff;
+            --secondary: #ffbe0b;
+            --accent: #fb8500;
+            --dark: #1c1c28;
+            --light: #f8f9fa;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-container {
+            flex: 1;
+        }
+
+        .navbar {
+            background: rgba(0,0,0,0.9);
+            padding: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffbe0b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:not(.gym-link):after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: var(--secondary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-links a:not(.gym-link):hover:after {
+            width: 80%;
+        }
+
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+
+        .gym-link {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white !important;
+            font-weight: bold;
+            padding: 0.7rem 1.5rem !important;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+        }
+
+        .gym-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,190,11,0.5);
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search {
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .search:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 2px var(--secondary);
+        }
+
+        .search::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(28, 28, 40, 0.6);
+            padding: 1.5rem;
+            border-radius: 15px;
+            height: fit-content;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar li:hover {
+            background: rgba(255,255,255,0.05);
+            padding-left: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .sidebar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid var(--secondary);
+        }
+
+        .channel-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .channel-game {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .main-content {
+            flex: 1;
+            background: rgba(28, 28, 40, 0.4);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .main-content h2 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .carousel {
+            position: relative;
+            margin-bottom: 3rem;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slide {
+            min-width: 100%;
+            position: relative;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .slide:hover img {
+            transform: scale(1.05);
+        }
+
+        .slide-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .slide-content h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .slide-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .slide-content .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+            cursor: pointer;
+            border: none;
+        }
+
+        .slide-content .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,190,11,0.5);
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,190,11,0.8);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .carousel-btn:hover {
+            background: rgba(255,190,11,1);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .prev {
+            left: 20px;
+        }
+
+        .next {
+            right: 20px;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: var(--secondary);
+            transform: scale(1.2);
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: rgba(28, 28, 40, 0.6);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(108, 99, 255, 0.3);
+        }
+
+        .product-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-info {
+            padding: 1.2rem;
+        }
+
+        .product-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .product-description {
+            color: #bbb;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-add-cart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+        }
+
+        .wishlist-btn {
+            background: transparent;
+            border: none;
+            color: #bbb;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-btn:hover {
+            color: var(--primary);
+            transform: scale(1.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .gym-section {
+            margin-top: 3rem;
+            padding: 2.5rem;
+            background: linear-gradient(45deg, rgba(255,190,11,0.15), rgba(108, 99, 255, 0.15));
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gym-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffbe0b' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .gym-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .gym-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2.5rem;
+            border-radius: 30px;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .gym-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+
+        .gym-btn:hover:before {
+            left: 100%;
+        }
+
+        .gym-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,190,11,0.5);
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .feature {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .floating-gym-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(255,190,11,0.4);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        .floating-gym-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(255,190,11,0.6);
+            animation: none;
+        }
+
+        .newsletter {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(28, 28, 40, 0.6);
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .newsletter h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .newsletter p {
+            margin-bottom: 1.5rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            gap: 0.5rem;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 2px var(--secondary);
+        }
+
+        .newsletter-btn {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+            border-top: 2px solid rgba(255,190,11,0.3);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary);
+            transform: translateX(5px);
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .social-icon:hover {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            transform: translateY(-3px);
+        }
+
+        .footer-newsletter p {
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .footer-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .footer-input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.15);
+            box-shadow: 0 0 0 2px var(--secondary);
+        }
+
+        .footer-btn {
+            background: linear-gradient(45deg, var(--secondary), var(--accent));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .footer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,190,11,0.3);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 1.5rem 0 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-bottom p {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+        }
+
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        .payment-icon {
+            font-size: 1.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 190, 11, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 190, 11, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 190, 11, 0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .navbar {
+                padding: 0 1rem;
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                gap: 0.8rem;
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .search-container {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .slide-content {
+                padding: 1rem;
+            }
+
+            .slide-content h3 {
+                font-size: 1.4rem;
+            }
+
+            .slide-content p {
+                font-size: 0.9rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .footer-form {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .category-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .features {
+                flex-direction: column;
+            }
+
+            .footer-section {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Barra superior -->
+        <header class="navbar">
+            <div class="logo"><i class="fas fa-dumbbell"></i> {{titulo}} <span>AGYM</span></div>
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Buscar productos, suplementos..." class="search">
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('inicio') }}"><i class="fas fa-home"></i> Inicio</a>
+                <a href="{{ url_for('login') }}"><i class="fas fa-key"></i> Login</a>
+                <a href="{{ url_for('registro') }}"><i class="fas fa-user-plus"></i> Registro</a>
+                <a href="{{ url_for('pagina2') }}" class="gym-link">
+                    <i class="fas fa-dumbbell"></i> Ir al Gimnasio
+                </a>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="sidebar fade-in">
+                <h3><i class="fas fa-fire"></i> Productos Populares</h3>
+                <ul>
+                    <li>
+                        <img src="uploads/proteinawhey.jpg" alt="Proteína">
+                        <div class="channel-info">
+                            <span class="channel-name">Proteína Whey</span>
+                            <span class="channel-game">$39.99</span>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Ropa Deportiva">
+                        <div class="channel-info">
+                            <span class="channel-name">Shorts Training</span>
+                            <span class="channel-game">$29.99</span>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="https://images.unsplash.com/photo-1595079835353-3b17a9da6de4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Accesorios">
+                        <div class="channel-info">
+                            <span class="channel-name">Guantes Gym</span>
+                            <span class="channel-game">$19.99</span>
+                        </div>
+                    </li>
+                    <li>
+                        <img src="https://images.unsplash.com/photo-1590462650543-8d2f2e364fab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="Creatina">
+                        <div class="channel-info">
+                            <span class="channel-name">Creatina Monohidrato</span>
+                            <span class="channel-game">$34.99</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <div style="margin-top: 2rem; padding: 1.2rem; background: rgba(255,190,11,0.1); border-radius: 10px;">
+                    <h4 style="color: var(--secondary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-truck"></i> Envío Gratis
+                    </h4>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin: 0;">
+                        En compras superiores a $50. ¡Aprovecha hoy!
+                    </p>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <h2><i class="fas fa-store"></i> Tienda de Suplementos y Equipamiento</h2>
+
+                <!-- Carousel de productos destacados -->
+                <div class="carousel">
+                    <div class="carousel-track">
+                        <div class="slide">
+                            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Suplementos">
+                            <div class="slide-content">
+                                <h3>NUEVA COLECCIÓN DE SUPLEMENTOS</h3>
+                                <p>Descubre nuestra línea premium de proteínas, creatinas y vitaminas para maximizar tu rendimiento</p>
+                                <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Ver Catálogo</button>
+                            </div>
+                        </div>
+                        <div class="slide">
+                            <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Equipamiento">
+                            <div class="slide-content">
+                                <h3>EQUIPAMIENTO PROFESIONAL</h3>
+                                <p>Desde pesas hasta máquinas de última generación, todo para tu home gym</p>
+                                <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Explorar</button>
+                            </div>
+                        </div>
+                        <div class="slide">
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Ropa Deportiva">
+                                <div class="slide-content">
+                                    <h3>ROPA DEPORTIVA TÉCNICA</h3>
+                                    <p>Diseñada para ofrecerte máximo confort y rendimiento durante tus entrenamientos</p>
+                                    <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Ver Colección</button>
+                                </div>
+                        </div>
+                    </div>
+                    <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
+                    <button class="carousel-btn next"><i class="fas fa-chevron-right"></i></button>
+                    <div class="carousel-indicators">
+                        <div class="indicator active"></div>
+                        <div class="indicator"></div>
+                        <div class="indicator"></div>
+                    </div>
+                </div>
+
+                <!-- Categorías -->
+                <div class="categories">
+                    <button class="category-btn active"><i class="fas fa-capsules"></i> Suplementos</button>
+                    <button class="category-btn"><i class="fas fa-dumbbell"></i> Equipamiento</button>
+                    <button class="category-btn"><i class="fas fa-tshirt"></i> Ropa Deportiva</button>
+                    <button class="category-btn"><i class="fas fa-apple-alt"></i> Nutrición</button>
+                    <button class="category-btn"><i class="fas fa-heartbeat"></i> Accesorios</button>
+                </div>
+
+                <!-- Grid de productos -->
+                <div class="products-grid">
+                    <div class="product-card fade-in">
+                        <div class="product-badge">Nuevo</div>
+                        <div class="product-image">
+                                <img src="{{ url_for('static', filename='uploads/proteinawhey.jpg') }}" alt="Proteína Whey">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">Proteína Whey Gold Standard</div>
+                            <div class="product-description">Proteína de suero de leche de alta calidad para la recuperación muscular</div>
+                            <div class="product-price">$39.99</div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                    <i class="fas fa-shopping-cart"></i> Comprar
+                                </button>
+                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card fade-in delay-1">
+                        <div class="product-badge" style="background: var(--accent)">Oferta</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1576678927484-cc907957088c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Creatina">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">Creatina Monohidrato 300g</div>
+                            <div class="product-description">Aumenta tu fuerza y resistencia durante los entrenamientos intensos</div>
+                            <div class="product-price">$34.99 <span style="text-decoration: line-through; color: #bbb; font-size: 0.9rem; margin-left: 0.5rem;">$44.99</span></div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                    <i class="fas fa-shopping-cart"></i> Comprar
+                                </button>
+                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card fade-in delay-2">
+                        <div class="product-image">
+                            <img src="{{ url_for('static', filename='uploads/guantes.jpg') }}" alt="Proteína Whey">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">Guantes de Gimnasio Pro</div>
+                            <div class="product-description">Protección y agarre perfecto para levantamiento de pesas</div>
+                            <div class="product-price">$19.99</div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                    <i class="fas fa-shopping-cart"></i> Comprar
+                                </button>
+                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="product-card fade-in delay-3">
+                        <div class="product-badge">Más Vendido</div>
+                        <div class="product-image">
+                            <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Shorts">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-title">Shorts de Entrenamiento</div>
+                            <div class="product-description">Ligeros y transpirables para mayor comodidad en tus workouts</div>
+                            <div class="product-price">$29.99</div>
+                            <div class="product-actions">
+                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                    <i class="fas fa-shopping-cart"></i> Comprar
+                                </button>
+                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección del gimnasio -->
+                <div class="gym-section">
+                    <h3><i class="fas fa-dumbbell"></i> ¿Listo para llevar tu entrenamiento al siguiente nivel?</h3>
+                    <p>Únete a nuestra comunidad fitness y accede a entrenamientos personalizados, planes de nutrición y seguimiento de progreso.</p>
+                    <a href="{{ url_for('pagina2') }}" class="gym-btn">Ir al Gimnasio Virtual</a>
+
+                    <div class="features">
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="feature-text">Seguimiento de Progreso</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-user-md"></i></div>
+                            <div class="feature-text">Asesoramiento Profesional</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-users"></i></div>
+                            <div class="feature-text">Comunidad Activa</div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-award"></i></div>
+                            <div class="feature-text">Logros y Recompensas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="newsletter">
+                    <h3><i class="fas fa-envelope"></i> Suscríbete a nuestro Newsletter</h3>
+                    <p>Recibe ofertas exclusivas, consejos de entrenamiento y las últimas novedades en suplementación.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Tu correo electrónico" class="newsletter-input" required>
+                        <button type="submit" class="newsletter-btn">Suscribirse</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('pagina2') }}" class="floating-gym-btn">
+            <i class="fas fa-dumbbell"></i>
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3><i class="fas fa-dumbbell"></i> {{titulo}} AGYM</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">
+                    Tu destino único para suplementos deportivos, equipamiento de gimnasio y asesoramiento fitness profesional.
+                </p>
+                <div class="footer-social">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-link"></i> Enlaces Rápidos</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('inicio') }}"><i class="fas fa-chevron-right"></i> Inicio</a></li>
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Iniciar Sesión</a></li>
+                    <li><a href="{{ url_for('registro') }}"><i class="fas fa-chevron-right"></i> Registrarse</a></li>
+                    <li><a href="{{ url_for('pagina2') }}"><i class="fas fa-chevron-right"></i> Gimnasio Virtual</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Blog Fitness</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-box-open"></i> Productos</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Suplementos</a></li>
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Proteínas</a></li>
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Creatinas</a></li>
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Vitaminas</a></li>
+                    <li><a href="{{ url_for('login') }}"><i class="fas fa-chevron-right"></i> Equipamiento</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3><i class="fas fa-headset"></i> Soporte</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Contacto</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Whatsapp:3222351342</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section footer-newsletter">
+                <h3><i class="fas fa-paper-plane"></i> Newsletter</h3>
+                <p>Suscríbete para recibir ofertas exclusivas y consejos de entrenamiento.</p>
+                <form class="footer-form">
+                    <input type="email" placeholder="Tu correo electrónico" class="footer-input" required>
+                    <button type="submit" class="footer-btn">Suscribirse</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="payment-methods">
+                <i class="fab fa-cc-visa payment-icon"></i>
+                <i class="fab fa-cc-mastercard payment-icon"></i>
+                <i class="fab fa-cc-paypal payment-icon"></i>
+                <i class="fab fa-cc-amex payment-icon"></i>
+                <i class="fab fa-apple-pay payment-icon"></i>
+            </div>
+            <p>&copy; 2023 {{titulo}} AGYM. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Carousel functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const track = document.querySelector('.carousel-track');
+            const slides = Array.from(track.children);
+            const nextButton = document.querySelector('.carousel-btn.next');
+            const prevButton = document.querySelector('.carousel-btn.prev');
+            const indicators = document.querySelectorAll('.indicator');
+
+            const slideWidth = slides[0].getBoundingClientRect().width;
+
+            // Arrange slides next to one another
+            const setSlidePosition = (slide, index) => {
+                slide.style.left = slideWidth * index + 'px';
+            };
+            slides.forEach(setSlidePosition);
+
+            const moveToSlide = (track, currentSlide, targetSlide) => {
+                track.style.transform = 'translateX(-' + targetSlide.style.left + ')';
+                currentSlide.classList.remove('current-slide');
+                targetSlide.classList.add('current-slide');
+            };
+
+            const updateIndicators = (currentIndicator, targetIndicator) => {
+                currentIndicator.classList.remove('active');
+                targetIndicator.classList.add('active');
+            };
+
+            let currentSlide = track.querySelector('.current-slide');
+            if (!currentSlide) {
+                currentSlide = slides[0];
+                currentSlide.classList.add('current-slide');
+            }
+
+            let currentIndicator = document.querySelector('.indicator.active');
+
+            // When I click right, move slides to the right
+            nextButton.addEventListener('click', e => {
+                const nextSlide = currentSlide.nextElementSibling || slides[0];
+                const nextIndex = slides.findIndex(slide => slide === nextSlide);
+                const nextIndicator = indicators[nextIndex];
+
+                moveToSlide(track, currentSlide, nextSlide);
+                updateIndicators(currentIndicator, nextIndicator);
+
+                currentSlide = nextSlide;
+                currentIndicator = nextIndicator;
+            });
+
+            // When I click left, move slides to the left
+            prevButton.addEventListener('click', e => {
+                const prevSlide = currentSlide.previousElementSibling || slides[slides.length - 1];
+                const prevIndex = slides.findIndex(slide => slide === prevSlide);
+                const prevIndicator = indicators[prevIndex];
+
+                moveToSlide(track, currentSlide, prevSlide);
+                updateIndicators(currentIndicator, prevIndicator);
+
+                currentSlide = prevSlide;
+                currentIndicator = prevIndicator;
+            });
+
+            // When I click the nav indicators, move to that slide
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', e => {
+                    const targetSlide = slides[index];
+                    const targetIndicator = indicator;
+
+                    moveToSlide(track, currentSlide, targetSlide);
+                    updateIndicators(currentIndicator, targetIndicator);
+
+                    currentSlide = targetSlide;
+                    currentIndicator = targetIndicator;
+                });
+            });
+
+            // Auto-advance carousel
+            setInterval(() => {
+                const nextSlide = currentSlide.nextElementSibling || slides[0];
+                const nextIndex = slides.findIndex(slide => slide === nextSlide);
+                const nextIndicator = indicators[nextIndex];
+
+                moveToSlide(track, currentSlide, nextSlide);
+                updateIndicators(currentIndicator, nextIndicator);
+
+                currentSlide = nextSlide;
+                currentIndicator = nextIndicator;
+            }, 5000);
+
+            // Category buttons functionality
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+
+            // Add login redirection to all buttons in main content
+            const mainContentButtons = document.querySelectorAll('.main-content button:not(.carousel-btn):not(.wishlist-btn)');
+            mainContentButtons.forEach(button => {
+                if (!button.hasAttribute('onclick')) {
+                    button.addEventListener('click', () => {
+                        window.location.href = "{{ url_for('login') }}";
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

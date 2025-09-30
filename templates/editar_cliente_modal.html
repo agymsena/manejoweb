@@ -1,0 +1,49 @@
+<!-- Modal Editar Cliente -->
+<div class="modal fade" id="editarClienteModal" tabindex="-1" aria-labelledby="editarClienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarClienteLabel"><i class="bi bi-pencil-square"></i> Editar Cliente</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <form action="" method="post" id="formEditarCliente">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="apellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="apellido" name="apellido" required>
+          </div>
+          <div class="mb-3">
+            <label for="membresia" class="form-label">Membresía</label>
+            <input type="number" step="0.01" class="form-control" id="membresia" name="membresia" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-circle"></i> Cancelar</button>
+          <button type="submit" class="btn btn-warning"><i class="bi bi-save"></i> Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Script para llenar el modal al hacer click en "Editar" -->
+<script>
+  const editarBotones = document.querySelectorAll('.btn-editar-cliente');
+
+  editarBotones.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cliente = JSON.parse(btn.dataset.cliente); // datos del cliente en JSON
+      const form = document.getElementById('formEditarCliente');
+
+      form.action = `/editar/${cliente.id}`; // ruta POST
+
+      document.getElementById('nombre').value = cliente.nombre;
+      document.getElementById('apellido').value = cliente.apellido;
+      document.getElementById('membresia').value = cliente.membresia;
+    });
+  });
+</script>

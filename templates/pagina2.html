@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ titulo }} - Gimnasio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+      :root {
+        --primary-dark: #3b2d6b;
+        --primary: #2a2f8f;
+        --secondary: #f5b301;
+        --dark-bg: #1c1c28;
+        --card-bg: #2a2f4f;
+        --text-light: #ffffff;
+        --success: #00cc88;
+        --danger: #ff4757;
+        --info: #2d8cf0;
+      }
+
+      body {
+        background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+        color: var(--text-light);
+        min-height: 100vh;
+        font-family: 'Montserrat', sans-serif;
+        padding-bottom: 2rem;
+      }
+
+      .navbar {
+        background: var(--dark-bg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 0.5rem 1rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.5rem;
+        padding: 0.5rem 0;
+      }
+
+      .navbar .nav-link {
+        transition: all 0.3s ease;
+        position: relative;
+      }
+
+      .navbar .btn {
+        margin-left: 0.5rem;
+        white-space: nowrap;
+      }
+
+      .card, .table {
+        background: var(--card-bg) !important;
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+      }
+
+      h1, h4, label {
+        color: var(--secondary);
+        font-weight: 700;
+      }
+
+      .form-control {
+        background: var(--dark-bg);
+        color: var(--text-light);
+        border: 1px solid #444;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 0 0 0.25rem rgba(245, 179, 1, 0.25);
+      }
+
+      .btn-warning {
+        background-color: var(--secondary);
+        border: none;
+        color: #000;
+        font-weight: bold;
+        transition: all 0.3s ease;
+      }
+
+      .btn-warning:hover {
+        background-color: #e5a500;
+        transform: scale(1.05);
+      }
+
+      .btn-danger {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-danger:hover {
+        transform: scale(1.05);
+      }
+
+      .btn-success {
+        background-color: var(--success);
+        border: none;
+        transition: all 0.3s ease;
+      }
+
+      .btn-success:hover {
+        background-color: #00b377;
+        transform: scale(1.05);
+      }
+
+      .badge.bg-warning {
+        background-color: var(--secondary) !important;
+        color: #000 !important;
+      }
+
+      /* Animaciones */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-fadeIn {
+        animation: fadeIn 0.6s ease forwards;
+      }
+
+      /* Efectos de tabla */
+      .table-hover tbody tr {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: rgba(245, 179, 1, 0.1) !important;
+        transform: scale(1.01);
+      }
+
+      /* Efectos para las tarjetas de estadísticas */
+      .stat-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-8px);
+      }
+
+      /* Loader personalizado */
+      .loader {
+        display: none;
+        width: 48px;
+        height: 48px;
+        border: 5px solid var(--secondary);
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        animation: rotation 1s linear infinite;
+        margin: 20px auto;
+      }
+
+      @keyframes rotation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Toast personalizado */
+      .toast-custom {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        background: var(--card-bg);
+        color: var(--text-light);
+        border-left: 4px solid var(--secondary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Efectos para los iconos */
+      .bi {
+        transition: transform 0.3s ease;
+      }
+
+      .btn:hover .bi {
+        transform: scale(1.2);
+      }
+
+      /* Efecto de pulso para elementos importantes */
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+      }
+
+      .pulse {
+        animation: pulse 2s infinite;
+      }
+
+      /* Scroll personalizado */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--dark-bg);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--secondary);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: #e5a500;
+      }
+
+      /* Efecto de aparición para elementos de la lista */
+      .client-row {
+        opacity: 0;
+      }
+
+      /* Estilos responsivos para la navbar */
+      @media (max-width: 768px) {
+        .navbar .d-flex {
+          margin-top: 0.5rem;
+          width: 100%;
+          justify-content: flex-end;
+        }
+
+        .navbar .btn {
+          margin: 0.25rem;
+        }
+      }
+
+      /* Estilos para formularios inline */
+      .form-inline {
+        display: inline;
+      }
+
+      .edit-mode {
+        border-left: 4px solid var(--secondary);
+        box-shadow: 0 0 20px rgba(245, 179, 1, 0.3);
+      }
+
+      .form-title-edit {
+        color: var(--secondary);
+        animation: pulse 2s infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toast para notificaciones -->
+    <div id="liveToast" class="toast toast-custom" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto" id="toast-title">Notificación</strong>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="toast-message">
+        Operación realizada con éxito.
+      </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteConfirmModalLabel"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de eliminar a <span id="deleteClientName" class="fw-bold text-warning"></span>?</p>
+            <p class="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+          </div>
+          <div class="modal-footer">
+            <form id="deleteForm" method="POST" class="form-inline">
+              <button type="submit" class="btn btn-danger">Sí, Eliminar</button>
+            </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navbar simplificada -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+      <div class="container">
+        <a class="navbar-brand text-warning fw-bold" href="{{ url_for('inicio') }}">
+          <i class="bi bi-controller"></i> {{ titulo }}
+        </a>
+
+        <div class="d-flex">
+          <a href="{{ url_for('admin_productos') }}" class="btn btn-warning">
+            <i class="bi bi-plus-circle"></i> Administrar Productos
+          </a>
+          {% if session.get('usuario') %}
+          <a class="btn btn-danger text-white ms-2" href="{{ url_for('logout') }}">
+            <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <h1 class="mb-4 animate-fadeIn"><i class="bi bi-award"></i> Gimnasio</h1>
+
+      <!-- Mensajes Flash -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="row g-4">
+
+        <!-- Formulario -->
+        <div class="col-md-4">
+          <div class="card p-3 animate-fadeIn" id="formCard" style="animation-delay: 0.2s;">
+            <h4 class="mb-3" id="formTitle">
+              <i class="bi bi-person-plus"></i>
+              {% if forma.id.data %}Editar Cliente{% else %}Nuevo Cliente{% endif %}
+            </h4>
+            <form id="clienteForm" action="{% if forma.id.data %}{{ url_for('actualizar_cliente') }}{% else %}{{ url_for('guardar_cliente') }}{% endif %}" method="post" autocomplete="off">
+              {{ forma.csrf_token }}
+              {{ forma.id }}
+              <div class="form-floating mb-3">
+                {{ forma.nombre(class="form-control", placeholder="Nombre", id="nombreInput") }}
+                {{ forma.nombre.label }}
+                <div class="invalid-feedback">Por favor ingresa un nombre válido</div>
+              </div>
+              <div class="form-floating mb-3">
+                {{ forma.apellido(class="form-control", placeholder="Apellido", id="apellidoInput") }}
+                {{ forma.apellido.label }}
+                <div class="invalid-feedback">Por favor ingresa un apellido válido</div>
+              </div>
+              <div class="form-floating mb-3">
+                {{ forma.membresia(class="form-control", placeholder="Membresía", id="membresiaInput", min="0", step="0.01") }}
+                {{ forma.membresia.label }}
+                <div class="invalid-feedback">Por favor ingresa un valor válido</div>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-warning me-2" id="guardarBtn">
+                  <i class="bi {% if forma.id.data %}bi-pencil{% else %}bi-plus-circle{% endif %}"></i>
+                  {% if forma.id.data %}Actualizar Cliente{% else %}Guardar Cliente{% endif %}
+                </button>
+                <a href="{{ url_for('pagina2') }}" class="btn btn-danger">
+                  <i class="bi bi-arrow-clockwise"></i> Limpiar
+                </a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tarjeta de información -->
+          <div class="card p-3 mt-4 animate-fadeIn" style="animation-delay: 0.4s;">
+            <h5><i class="bi bi-info-circle"></i> Información</h5>
+            <p class="small mb-0">Gestiona los clientes de tu gimnasio. Agrega nuevos miembros, edita sus datos o elimínalos si es necesario.</p>
+          </div>
+        </div>
+
+        <!-- Lista de clientes -->
+        <div class="col-md-8">
+          <div class="card p-3 animate-fadeIn" style="animation-delay: 0.3s;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4><i class="bi bi-people"></i> Lista de Clientes</h4>
+              <div>
+                <span class="badge bg-warning text-dark pulse">Total: {{ clientes|length }}</span>
+                <button class="btn btn-sm btn-outline-light ms-2" id="btnRefresh" onclick="location.reload()">
+                  <i class="bi bi-arrow-repeat"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Buscador -->
+            <div class="input-group mb-3">
+              <span class="input-group-text bg-dark text-light border-dark">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text" id="searchInput" class="form-control bg-dark text-light border-dark" placeholder="Buscar cliente...">
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-warning text-dark">
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Membresía</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="clientesTable">
+                  {% for cliente in clientes %}
+                  <tr class="client-row" data-id="{{ cliente.id }}">
+                    <td>{{ cliente.id }}</td>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.apellido }}</td>
+                    <td>${{ cliente.membresia }}</td>
+                    <td class="text-center">
+                      <!-- Botón Editar - Ahora redirige al formulario principal -->
+                      <a href="{{ url_for('pagina2') }}?editar={{ cliente.id }}" class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Editar">
+                        <i class="bi bi-pencil"></i>
+                      </a>
+
+                      <!-- Formulario para eliminar -->
+                      <form action="{{ url_for('eliminar_cliente', id=cliente.id) }}" method="POST" class="form-inline d-inline">
+                        <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Eliminar"
+                                onclick="return confirm('¿Estás seguro de eliminar a {{ cliente.nombre }} {{ cliente.apellido }}?')">
+                          <i class="bi bi-trash3"></i>
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center text-muted py-4">
+                      <i class="bi bi-people display-4 d-block mb-2"></i>
+                      No hay clientes registrados
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Estadísticas -->
+            {% if clientes %}
+            <div class="row mt-4 g-3" id="estadisticas">
+              <div class="col-md-4">
+                <div class="stat-card card bg-primary text-white text-center p-3">
+                  <h5>{{ clientes|length }}</h5>
+                  <small>Clientes Totales</small>
+                  <i class="bi bi-people-fill display-4 opacity-25 position-absolute top-0 end-0 me-3 mt-2"></i>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card card bg-success text-white text-center p-3">
+                  <h5>${{ "%.2f"|format(clientes|sum(attribute='membresia')) }}</h5>
+                  <small>Ingresos Totales</small>
+                  <i class="bi bi-currency-dollar display-4 opacity-25 position-absolute top-0 end-0 me-3 mt-2"></i>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card card bg-info text-white text-center p-3">
+                  <h5>${{ "%.2f"|format((clientes|sum(attribute='membresia')) / clientes|length) if clientes|length > 0 else 0 }}</h5>
+                  <small>Promedio por Cliente</small>
+                  <i class="bi bi-graph-up display-4 opacity-25 position-absolute top-0 end-0 me-3 mt-2"></i>
+                </div>
+              </div>
+
+              <!-- Botón para generar reporte PDF -->
+              <div class="col-12 text-center mt-3">
+                <button id="btnGenerarPDF" class="btn btn-success btn-lg">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar Reporte PDF
+                </button>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Inicializar tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+
+      // Inicializar toast
+      const toastEl = document.getElementById('liveToast');
+      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+
+      // Mostrar notificación
+      function showToast(title, message, type = 'success') {
+        document.getElementById('toast-title').textContent = title;
+        document.getElementById('toast-message').textContent = message;
+
+        // Cambiar color según el tipo
+        if (type === 'error') {
+          toastEl.querySelector('.toast-header').style.borderLeftColor = '#ff4757';
+        } else if (type === 'warning') {
+          toastEl.querySelector('.toast-header').style.borderLeftColor = '#f5b301';
+        } else {
+          toastEl.querySelector('.toast-header').style.borderLeftColor = '#00cc88';
+        }
+
+        toast.show();
+      }
+
+      // Verificar si estamos en modo edición desde la URL
+      function checkEditMode() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const editarId = urlParams.get('editar');
+
+        if (editarId) {
+          // Buscar el cliente en la tabla
+          const clienteRow = document.querySelector(`tr[data-id="${editarId}"]`);
+          if (clienteRow) {
+            const cells = clienteRow.cells;
+            const nombre = cells[1].textContent;
+            const apellido = cells[2].textContent;
+            const membresia = cells[3].textContent.replace('$', '');
+
+            // Mostrar mensaje informativo
+            showToast('Modo edición', `Editando a ${nombre} ${apellido}`, 'info');
+
+            // Hacer scroll al formulario
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      }
+
+      // Validación de formulario
+      document.getElementById('clienteForm').addEventListener('submit', function(e) {
+        let isValid = true;
+
+        // Validar nombre
+        const nombreInput = document.getElementById('nombreInput');
+        if (!nombreInput.value.trim()) {
+          nombreInput.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          nombreInput.classList.remove('is-invalid');
+        }
+
+        // Validar apellido
+        const apellidoInput = document.getElementById('apellidoInput');
+        if (!apellidoInput.value.trim()) {
+          apellidoInput.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          apellidoInput.classList.remove('is-invalid');
+        }
+
+        // Validar membresía
+        const membresiaInput = document.getElementById('membresiaInput');
+        if (!membresiaInput.value || parseFloat(membresiaInput.value) <= 0) {
+          membresiaInput.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          membresiaInput.classList.remove('is-invalid');
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          showToast('Error', 'Por favor completa todos los campos correctamente.', 'error');
+        }
+      });
+
+      // Búsqueda en tiempo real
+      document.getElementById('searchInput').addEventListener('input', function() {
+        const searchText = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#clientesTable tr');
+
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(searchText) ? '' : 'none';
+        });
+      });
+
+      // Efectos de animación para las filas de la tabla
+      document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.client-row');
+        rows.forEach((row, index) => {
+          setTimeout(() => {
+            row.style.opacity = '1';
+            row.style.transition = 'opacity 0.5s ease';
+          }, index * 100);
+        });
+
+        // Verificar modo edición al cargar la página
+        checkEditMode();
+
+        // Auto-ocultar mensajes flash después de 5 segundos
+        setTimeout(() => {
+          const alerts = document.querySelectorAll('.alert');
+          alerts.forEach(alert => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+          });
+        }, 5000);
+      });
+
+      // Ordenar tabla al hacer clic en los encabezados
+      document.querySelectorAll('thead th').forEach((header, index) => {
+        if (index < 4) { // Solo las primeras 4 columnas son ordenables
+          header.style.cursor = 'pointer';
+          header.addEventListener('click', () => {
+            sortTable(index);
+          });
+        }
+      });
+
+      // Función para ordenar la tabla
+      function sortTable(columnIndex) {
+        const table = document.getElementById('clientesTable');
+        const rows = Array.from(table.querySelectorAll('tr'));
+        const isNumeric = columnIndex === 0 || columnIndex === 3; // ID y Membresía son numéricos
+
+        // Determinar el orden actual y alternarlo
+        const currentOrder = table.getAttribute('data-sort-order') || 'asc';
+        const newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+        table.setAttribute('data-sort-order', newOrder);
+
+        // Excluir la fila de "no hay clientes"
+        const dataRows = rows.filter(row => row.cells.length > 1);
+
+        dataRows.sort((a, b) => {
+          let aValue = a.cells[columnIndex].textContent.trim();
+          let bValue = b.cells[columnIndex].textContent.trim();
+
+          if (isNumeric) {
+            aValue = aValue.replace('$', '');
+            bValue = bValue.replace('$', '');
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+          } else {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+          }
+
+          if (aValue < bValue) return newOrder === 'asc' ? -1 : 1;
+          if (aValue > bValue) return newOrder === 'asc' ? 1 : -1;
+          return 0;
+        });
+
+        // Reconstruir la tabla
+        table.innerHTML = '';
+        if (dataRows.length === 0) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                <i class="bi bi-people display-4 d-block mb-2"></i>
+                No hay clientes registrados
+              </td>
+            </tr>
+          `;
+        } else {
+          dataRows.forEach(row => {
+            table.appendChild(row);
+          });
+        }
+
+        showToast('Tabla ordenada', `Columna ordenada en orden ${newOrder === 'asc' ? 'ascendente' : 'descendente'}.`, 'info');
+      }
+
+      // Función para generar el reporte PDF
+      document.getElementById('btnGenerarPDF').addEventListener('click', function() {
+        // Mostrar mensaje de generación
+        showToast('Generando PDF', 'El reporte se está generando, por favor espere...', 'info');
+
+        // Usar jsPDF con autotable
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Título del reporte
+        doc.setFontSize(20);
+        doc.setTextColor(43, 47, 143); // Color primario
+        doc.text('Reporte de Clientes - Gimnasio', 105, 15, { align: 'center' });
+
+        // Fecha de generación
+        const fecha = new Date().toLocaleDateString('es-ES');
+        doc.setFontSize(10);
+        doc.setTextColor(100, 100, 100);
+        doc.text(`Generado el: ${fecha}`, 105, 22, { align: 'center' });
+
+        // Estadísticas
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        const totalClientes = {{ clientes|length }};
+        const ingresosTotales = {{ clientes|sum(attribute='membresia') }};
+        const promedio = {{ (clientes|sum(attribute='membresia') / clientes|length) if clientes|length > 0 else 0 }};
+
+        doc.text(`Total de clientes: ${totalClientes}`, 20, 35);
+        doc.text(`Ingresos totales: $${ingresosTotales.toFixed(2)}`, 20, 42);
+        doc.text(`Promedio por cliente: $${promedio.toFixed(2)}`, 20, 49);
+
+        // Tabla de clientes
+        const tableColumn = ["ID", "Nombre", "Apellido", "Membresía"];
+        const tableRows = [];
+
+        {% for cliente in clientes %}
+          tableRows.push([
+            "{{ cliente.id }}",
+            "{{ cliente.nombre }}",
+            "{{ cliente.apellido }}",
+            "${{ cliente.membresia }}"
+          ]);
+        {% endfor %}
+
+        // Agregar la tabla al PDF
+        doc.autoTable({
+          head: [tableColumn],
+          body: tableRows,
+          startY: 60,
+          theme: 'grid',
+          styles: {
+            fontSize: 10,
+            cellPadding: 3,
+            fillColor: [245, 179, 1] // Color secundario para encabezados
+          },
+          headStyles: {
+            fillColor: [43, 47, 143], // Color primario para encabezados
+            textColor: 255
+          },
+          alternateRowStyles: {
+            fillColor: [240, 240, 240]
+          },
+          margin: { top: 60 }
+        });
+
+        // Guardar el PDF
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Reporte generado automáticamente por el sistema de gestión del gimnasio', 105, finalY, { align: 'center' });
+
+        // Guardar el archivo
+        doc.save(`reporte_clientes_${fecha.replace(/\//g, '-')}.pdf`);
+
+        // Mostrar mensaje de éxito
+        setTimeout(() => {
+          showToast('PDF Generado', 'El reporte se ha descargado correctamente.', 'success');
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
