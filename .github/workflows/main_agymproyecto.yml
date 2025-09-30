@@ -51,16 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A817F0B3C5E84D0CB3177B9B1DF0CB75 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F58DC775232149B1B2DA0BACBAF0AAA9 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_69614798EF06454C8939D1FD8091E938 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B4B9B8EA70BF4435A5F264B6BB6026BE }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_8A83AE7E9D004DA19B057443932F3CCB }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FCBADFD257CC4D23ABDC5F800045A898 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'AGYM'
+          app-name: 'Agymproyecto'
           slot-name: 'Production'
           package: .
-
           
