@@ -444,6 +444,7 @@
             margin-bottom: 1rem;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1056,7 +1057,7 @@
                             <div class="slide-content">
                                 <h3>NUEVA COLECCIÓN DE SUPLEMENTOS</h3>
                                 <p>Descubre nuestra línea premium de proteínas, creatinas y vitaminas para maximizar tu rendimiento</p>
-                                <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Ver Catálogo</button>
+                                <button class="btn" onclick='window.location.href="{{ url_for("login") }}"'>Ver Catálogo</button>
                             </div>
                         </div>
                         <div class="slide">
@@ -1064,7 +1065,7 @@
                             <div class="slide-content">
                                 <h3>EQUIPAMIENTO PROFESIONAL</h3>
                                 <p>Desde pesas hasta máquinas de última generación, todo para tu home gym</p>
-                                <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Explorar</button>
+                                <button class="btn" onclick='window.location.href="{{ url_for("login") }}"'>Explorar</button>
                             </div>
                         </div>
                         <div class="slide">
@@ -1072,7 +1073,7 @@
                                 <div class="slide-content">
                                     <h3>ROPA DEPORTIVA TÉCNICA</h3>
                                     <p>Diseñada para ofrecerte máximo confort y rendimiento durante tus entrenamientos</p>
-                                    <button class="btn" onclick="window.location.href='{{ url_for('login') }}'">Ver Colección</button>
+                                    <button class="btn" onclick='window.location.href="{{ url_for("login") }}"'>Ver Colección</button>
                                 </div>
                         </div>
                     </div>
@@ -1106,7 +1107,7 @@
                             <div class="product-description">Proteína de suero de leche de alta calidad para la recuperación muscular</div>
                             <div class="product-price">$39.99</div>
                             <div class="product-actions">
-                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                <button class="btn-add-cart" onclick='window.location.href="{{ url_for("login") }}"'>
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 <button class="wishlist-btn"><i class="far fa-heart"></i></button>
@@ -1124,7 +1125,7 @@
                             <div class="product-description">Aumenta tu fuerza y resistencia durante los entrenamientos intensos</div>
                             <div class="product-price">$34.99 <span style="text-decoration: line-through; color: #bbb; font-size: 0.9rem; margin-left: 0.5rem;">$44.99</span></div>
                             <div class="product-actions">
-                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                <button class="btn-add-cart" onclick='window.location.href="{{ url_for("login") }}"'>
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 <button class="wishlist-btn"><i class="far fa-heart"></i></button>
@@ -1141,7 +1142,7 @@
                             <div class="product-description">Protección y agarre perfecto para levantamiento de pesas</div>
                             <div class="product-price">$19.99</div>
                             <div class="product-actions">
-                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                <button class="btn-add-cart" onclick='window.location.href="{{ url_for("login") }}"'>
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 <button class="wishlist-btn"><i class="far fa-heart"></i></button>
@@ -1150,6 +1151,7 @@
                     </div>
 
                     <div class="product-card fade-in delay-3">
+
                         <div class="product-badge">Más Vendido</div>
                         <div class="product-image">
                             <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80" alt="Shorts">
@@ -1159,7 +1161,7 @@
                             <div class="product-description">Ligeros y transpirables para mayor comodidad en tus workouts</div>
                             <div class="product-price">$29.99</div>
                             <div class="product-actions">
-                                <button class="btn-add-cart" onclick="window.location.href='{{ url_for('login') }}'">
+                                <button class="btn-add-cart" onclick='window.location.href="{{ url_for("login") }}"'>
                                     <i class="fas fa-shopping-cart"></i> Comprar
                                 </button>
                                 <button class="wishlist-btn"><i class="far fa-heart"></i></button>
